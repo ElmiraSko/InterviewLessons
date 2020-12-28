@@ -9,7 +9,7 @@ CREATE TABLE `cinema_db`.`films` (
 CREATE TABLE `cinema_db`.`schedule` (
   `id` MEDIUMINT(10) UNSIGNED NOT NULL AUTO_INCREMENT,
   `date` DATE NOT NULL,
-  `start` TIME NOT NULL,
+  `beginning` TIME NOT NULL,
   `price` DECIMAL(8,2) NOT NULL,
   `film_id` SMALLINT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
@@ -25,20 +25,13 @@ CREATE TABLE `cinema_db`.`orders` (
   `ticket_number` MEDIUMINT(10) NULL,
   `purchase_date` DATETIME(6) NOT NULL,
   `session` MEDIUMINT(10) UNSIGNED NOT NULL,
-  `film` SMALLINT(10) UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_session_idx` (`session` ASC) VISIBLE,
-  INDEX `fk_film_idx` (`film` ASC) VISIBLE,
   CONSTRAINT `fk_session`
     FOREIGN KEY (`session`)
     REFERENCES `cinema_db`.`schedule` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_film`
-    FOREIGN KEY (`film`)
-    REFERENCES `cinema_db`.`films` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION);
+    ON UPDATE NO ACTION;
     
 # Заполняем таблицу films данными    
 INSERT INTO `cinema_db`.`films` (`name`, `duration`) VALUES ('Леон', '60');
