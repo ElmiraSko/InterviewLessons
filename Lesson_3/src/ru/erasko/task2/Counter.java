@@ -26,6 +26,11 @@ public class Counter {
     }
 
     public int getCount() {
-        return count;
+        lock.lock();
+        try {
+            return count;
+        } finally {
+            lock.unlock();
+        }
     }
 }
