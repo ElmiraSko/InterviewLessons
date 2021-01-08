@@ -22,7 +22,7 @@ public class StudentDaoImpl implements StudentDao{
     public void save(Student student) {
         Session session = sessionFactory.openSession();
         Transaction tx1 = session.beginTransaction();
-        session.save(student);
+        session.persist(student);
         tx1.commit();
         session.close();
     }
@@ -30,7 +30,7 @@ public class StudentDaoImpl implements StudentDao{
     public void update(Student student) {
         Session session = sessionFactory.openSession();
         Transaction tx1 = session.beginTransaction();
-        session.update(student);
+        session.merge(student);
         tx1.commit();
         session.close();
     }
