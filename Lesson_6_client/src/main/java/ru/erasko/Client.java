@@ -3,9 +3,10 @@ package ru.erasko;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 public class Client {
-    private static final String HOST_PORT = "Host: localhost:8088";
+    private static final String HOST_PORT = "localhost:8088";
 
     private Socket socket = null;
     private BufferedReader input = null;
@@ -26,61 +27,55 @@ public class Client {
     }
 
     public void getAllUsers() {
-        //отправляем запрос
-        output.println("GET /web-app/users HTTP/1.1");
-        output.println(HOST_PORT);
-        output.println();
+        Request request = new Request.Builder()
+                .setMethod("GET")
+                .setSimplePath("/web-app/users")
+                .setHost(HOST_PORT)
+                .build();
+        output.println(request);
         output.flush();
 
-        // ответ сервера
         System.out.println("=== getAllUsers ===");
         serverAnswer(input);
     }
 
     public void getUserById(long id) {
-        //отправляем запрос
-        output.println("GET /web-app/users/get/" + id + " HTTP/1.1");
-        output.println(HOST_PORT);
-        output.println();
+        Request request = new Request.Builder()
+                .setMethod("GET")
+                .setPathWithVariable("/web-app/users/get", id)
+                .setHost(HOST_PORT)
+                .build();
+        output.println(request);
         output.flush();
 
-        // ответ сервера
         System.out.println("=== getUserById ===");
         serverAnswer(input);
     }
 
-    public void getUserByName(String name) {
-        //отправляем запрос
-        output.println("GET /web-app/users/get?name=" + name + " HTTP/1.1");
-        output.println(HOST_PORT);
-        output.println();
+    public void getUserByName(Map<String, Object> params) {
+        Request request = new Request.Builder()
+                .setMethod("GET")
+                .setPathWithRequestParam("/web-app/users/get", params)
+                .setHost(HOST_PORT)
+                .build();
+        output.println(request);
         output.flush();
 
-        // ответ сервера
         System.out.println("=== getUserByName ===");
         serverAnswer(input);
     }
 
-    public void saveNewUser(String newName, int newAge) {
-
-        StringBuilder newUser = new StringBuilder("{\r\n");
-        newUser.append("  \"name\": \"");
-        newUser.append(newName);
-        newUser.append("\",\r\n");
-        newUser.append("  \"age\": ");
-        newUser.append(newAge);
-        newUser.append("\r\n}");
-
-        System.out.println(newUser);
-        //отправляем запрос
-        output.println("POST /web-app/users/add HTTP/1.1");
-        output.println(HOST_PORT);
-        output.println("Content-Type: application/json");
-        output.println("Content-Length: 39");
-        output.println();
-        output.println(newUser.toString());
+    public void saveNewUser(User newUser) {
+        Request request = new Request.Builder()
+                .setMethod("POST")
+                .setSimplePath("/web-app/users/add")
+                .setHost(HOST_PORT)
+                .setContentType("application/json")
+                .setRequestBody(newUser)
+                .build();
+        output.println(request);
         output.flush();
-        // ответ сервера
+
         System.out.println("=== saveNewUser ===");
         serverAnswer(input);
     }
@@ -100,7 +95,10 @@ public class Client {
             while (!input.ready());
             while (input.ready()) {
                 String answer = input.readLine();
-                System.out.println(answer);
+                if (answer.startsWith("HTTP"))
+                    System.out.println("Статус ответа: " + answer);
+                if (answer.startsWith("{") || answer.startsWith("["))
+                    System.out.println(answer);
             }
         } catch (IOException e) {
             e.printStackTrace();
